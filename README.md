@@ -1,5 +1,9 @@
 # cppmeta
-one header tiny C++ type meta-information library for reflection and serialization
+one header tiny C++ type meta-information library for reflection and serialization for classes, functions, types
+
+- single header
+- no external dependencies except for small set of C++98 std library headers
+- terms used for registering and retrieving meta-information are standard complient
 
 ----------
 
