@@ -3,7 +3,7 @@ mkdir ./tests/bin
 build_ok=1
 exclude_warn=""
 build_libs="-lrt"
-testgroup="**"
+testgroup="/"
 
 if [ "$1" == "debug" ]
 	then
@@ -71,8 +71,8 @@ else
     filename="${filename%.*}"
     foldername=$(dirname -- "$file")
     foldername=$(basename -- "$foldername")
-    echo "$(date): compiling test c++03 $foldername:$filename"
-    if ! $COMPILER -std=c++03 -pedantic $exclude_warn $file -I./src/ $build_libs -o "./tests/bin/$foldername:$filename"; then
+    echo "$(date): compiling test c++03 $foldername-$filename"
+    if ! $COMPILER -std=c++03 -pedantic $exclude_warn $file -I./src/ $build_libs -o "./tests/bin/$foldername-$filename"; then
       build_ok=0
     fi
   done
