@@ -51,6 +51,12 @@ namespace cppmeta
         void operator()() const {}
     };
 
+    template<class T>
+    struct reflect_ct;
+
+    template<class T>
+    struct reflect_rt;
+
     template<class T = detail::void_type, int Reflection = reflection::run_time>
     struct resolve;
 
@@ -2488,7 +2494,7 @@ namespace cppmeta
                 return result;
             }
 
-            class internal
+            struct internal
             {
                 typedef typename detail::entities_containter<ParentT>::type type;
                 static type& value()
