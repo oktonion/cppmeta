@@ -776,7 +776,7 @@ namespace cppmeta
         bad_any_cast(const std::string &msg)
             : what_("cppmeta::bad_any_cast: " + msg) {}
 
-        const char * what() const
+        const char * what() const throw()
         {
             return what_.c_str();
         }
