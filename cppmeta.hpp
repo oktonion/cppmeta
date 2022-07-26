@@ -1217,7 +1217,7 @@ namespace cppmeta
 
             template<class T>
             static 
-            std::out_of_range is_not_registered(const std::string &name, const std::string &category_name)
+            std::out_of_range is_not_registered_named(const std::string &name, const std::string &category_name)
             {
                 return std::out_of_range(
                     make_message<T>(name, category_name, "is not registered"));
@@ -1227,6 +1227,8 @@ namespace cppmeta
             static 
             std::out_of_range is_not_registered(const ValueT &value, const std::string &category_name)
             {
+                if (type_traits::is_convertable<ValueT, std::string>::value)
+                    return is_not_registered_named(value, category_name);
                 return is_not_registered<T>(resolve<ValueT>::name, category_name + " entitiy");
             }
 
