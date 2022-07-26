@@ -773,6 +773,7 @@ namespace cppmeta
     {
         std::string what_;
     public:
+        ~bad_any_cast() throw() {}
         bad_any_cast(const std::string &msg)
             : what_("cppmeta::bad_any_cast: " + msg) {}
 
@@ -2485,7 +2486,7 @@ namespace cppmeta
                     static captured_type& get()
                     {
                         cppmeta::reflect_ct<captured_ParentT> tmp;
-                        tmp.operator() < captured_ParentT > ();
+                        tmp.template operator() < captured_ParentT > ();
                         return cppmeta::detail::declstaticval<captured_type, captured_ParentT>();
                     }
                 };
