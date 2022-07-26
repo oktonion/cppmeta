@@ -106,7 +106,7 @@ jobs:
         COMPILER: ${{ matrix.CPP_COMPILER }}
         LIBRARY_PATH: ${{ matrix.LIBRARY_PATH }}
       run: |
-        ./${{ matrix.BUILD_SCRIPT }} service
+        ./${{ matrix.BUILD_SCRIPT }}
     - name: run tests
       run: |
         ./${{ matrix.RUN_SCRIPT }}
