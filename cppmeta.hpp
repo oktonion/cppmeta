@@ -10,6 +10,7 @@
 #include <string>
 #include <cassert>
 #include <algorithm>
+#include <typeinfo>
 
 #ifdef _MSC_VER
 #pragma warning( push )
