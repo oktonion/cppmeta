@@ -1002,6 +1002,9 @@ namespace cppmeta
 
     namespace detail
     {
+        template<class>
+        struct member_resolver;
+
         template <
             class ResultT,
             class ClassT,
@@ -1593,7 +1596,14 @@ namespace cppmeta
     {
         any _entity;
         struct vtable_type {};
-        typedef void(*type_id_type)();
+        
+        struct type_id_type{
+            typedef void(*id_type)();
+            id_type id;
+            type_id_type(id_type id_ = NULL): id(id_) {}
+            bool operator==(const type_id_type &other) const {return id == other.id;}
+            bool operator!=(const type_id_type &other) const {return id != other.id;}
+        };
         template<class T>
         static type_id_type _type_id()
         {
@@ -1624,10 +1634,12 @@ namespace cppmeta
         get_underlying_entity_value_t get_underlying_entity_value;
         get_underlying_entity_info_t get_underlying_entity_info;
 
-    public:
+        type_id_type stored_member_type_id;
+        type_id_type stored_class_type_id;
 
-        const type_id_type stored_member_type_id;
-        const type_id_type stored_class_type_id;
+        template<class> friend struct detail::member_resolver;
+
+    public:
         const any& value;
 
         template <class ClassT, class T>
@@ -2485,19 +2497,20 @@ namespace cppmeta
 
             static type& value()
             {
-                struct lambdas
+                struct reflect_ct_local
+                    : cppmeta::reflect_ct<ParentT>
                 {
                     typedef type captured_type;
                     typedef ParentT captured_ParentT;
-                    static captured_type& get()
+                    typedef cppmeta::reflect_ct<captured_ParentT> base;
+                    captured_type& get()
                     {
-                        cppmeta::reflect_ct<captured_ParentT> tmp;
-                        tmp.template operator() < captured_ParentT > ();
+                        base::operator() < captured_ParentT > ();
                         return cppmeta::detail::declstaticval<captured_type, captured_ParentT>();
                     }
                 };
                 static type &result = 
-                    lambdas::get();
+                    reflect_ct_local().get();
                 return result;
             }
 
@@ -3176,8 +3189,6 @@ namespace cppmeta
 
     namespace detail
     {
-        template<class>
-        struct member_resolver;
 
         template<>
         struct member_resolver<void>
@@ -3587,7 +3598,7 @@ namespace cppmeta
     }
 
     template<class ParentT>
-    detail::entities_containter<ParentT> operator,(const std::string& name, const detail::entities_containter<ParentT>& container)
+    detail::entities_containter<ParentT> operator,(const std::string&, const detail::entities_containter<ParentT>& container)
     {
         return container;
     }
