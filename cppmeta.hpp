@@ -60,7 +60,7 @@ namespace cppmeta
             template<class meta>
             static void call(meta&)
             {
-                return info<meta>();
+                return cppmeta::reflect<T, reflection::compile_time>::template info<meta>();
             }
         };
     }
