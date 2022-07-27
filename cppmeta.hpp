@@ -58,7 +58,7 @@ namespace cppmeta
             : cppmeta::reflect<T, reflection::compile_time>
         {
             template<class meta_info>
-            void operator()() const 
+            void operator()(meta_info&) const 
             {
                 return cppmeta::reflect<T, reflection::compile_time>::operator()<meta_info>();
             }
@@ -2520,8 +2520,10 @@ namespace cppmeta
 
                     captured_type& get()
                     {
-                        operator() < captured_ParentT > ();
-                        return cppmeta::detail::declstaticval<captured_type, captured_ParentT>();
+                        captured_type &result = 
+                            cppmeta::detail::declstaticval<captured_type, captured_ParentT>();
+                        (*this)(result);
+                        return result;
                     }
                 };
                 static type &result = 
