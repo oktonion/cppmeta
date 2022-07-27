@@ -51,6 +51,20 @@ namespace cppmeta
         void operator()() const {}
     };
 
+    namespace detail
+    {
+        template<class T>
+        struct reflect_ct_helper
+            : cppmeta::reflect<T, reflection::compile_time>
+        {
+            template<class meta_info>
+            void operator()() const 
+            {
+                return cppmeta::reflect<T, reflection::compile_time>::operator()<meta_info>();
+            }
+        };
+    }
+
     template<class T>
     struct reflect_ct;
 
@@ -2498,17 +2512,15 @@ namespace cppmeta
             static type& value()
             {
                 struct reflect_ct_local
-                    : cppmeta::reflect_ct<ParentT>
+                    : cppmeta::detail::reflect_ct_helper<ParentT>
                 {
                     typedef type captured_type;
                     typedef ParentT captured_ParentT;
-                    typedef cppmeta::reflect_ct<captured_ParentT> base;
-
-                    using base::operator();
+                    typedef cppmeta::detail::reflect_ct_helper<captured_ParentT> base;
 
                     captured_type& get()
                     {
-                        base::operator() < captured_ParentT > ();
+                        operator() < captured_ParentT > ();
                         return cppmeta::detail::declstaticval<captured_type, captured_ParentT>();
                     }
                 };
