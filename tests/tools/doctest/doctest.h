@@ -2647,21 +2647,21 @@ int registerReporter(const char* name, int priority, bool isReporter) {
 // for grouping tests in test suites by using code blocks
 #define DOCTEST_TEST_SUITE_IMPL(decorators, ns_name)                                               \
     namespace ns_name { namespace doctest_detail_test_suite_ns {                                   \
-            static DOCTEST_NOINLINE doctest::detail::TestSuite& getCurrentTestSuite() {            \
                 DOCTEST_MSVC_SUPPRESS_WARNING_WITH_PUSH(4640)                                      \
                 DOCTEST_CLANG_SUPPRESS_WARNING_WITH_PUSH("-Wexit-time-destructors")                \
                 DOCTEST_GCC_SUPPRESS_WARNING_WITH_PUSH("-Wmissing-field-initializers")             \
+            static DOCTEST_NOINLINE doctest::detail::TestSuite& getCurrentTestSuite() {            \
                 static doctest::detail::TestSuite data;                                            \
                 static bool                       inited = false;                                  \
-                DOCTEST_MSVC_SUPPRESS_WARNING_POP                                                  \
-                DOCTEST_CLANG_SUPPRESS_WARNING_POP                                                 \
-                DOCTEST_GCC_SUPPRESS_WARNING_POP                                                   \
                 if(!inited) {                                                                      \
                     data* decorators;                                                              \
                     inited = true;                                                                 \
                 }                                                                                  \
                 return data;                                                                       \
             }                                                                                      \
+                DOCTEST_MSVC_SUPPRESS_WARNING_POP                                                  \
+                DOCTEST_CLANG_SUPPRESS_WARNING_POP                                                 \
+                DOCTEST_GCC_SUPPRESS_WARNING_POP                                                   \
         }                                                                                          \
     }                                                                                              \
     namespace ns_name
