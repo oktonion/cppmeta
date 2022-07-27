@@ -2503,6 +2503,9 @@ namespace cppmeta
                     typedef type captured_type;
                     typedef ParentT captured_ParentT;
                     typedef cppmeta::reflect_ct<captured_ParentT> base;
+
+                    using base::operator();
+
                     captured_type& get()
                     {
                         base::operator() < captured_ParentT > ();
