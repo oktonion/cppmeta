@@ -57,6 +57,7 @@ namespace cppmeta
         struct reflect_ct_helper
             : cppmeta::reflect<T, reflection::compile_time>
         {
+            using cppmeta::reflect<T, reflection::compile_time>::info;
             template<class meta>
             static void call(meta&)
             {
