@@ -1711,6 +1711,17 @@ namespace cppmeta
             , value(get_underlying_entity_value(_entity))
         { }
 
+        Entity& operator=(const Entity& other)
+        {
+            static_cast<EntityInfo&>(*this) = other;
+            _entity = other._entity;
+            get_underlying_entity_value = other.get_underlying_entity_value;
+            get_underlying_entity_info = other.get_underlying_entity_info;
+            stored_member_type_id = other.stored_member_type_id;
+            stored_class_type_id = other.stored_class_type_id;
+            return *this;
+        }
+
         template<class T>
         static type_id_type type_id()
         {
