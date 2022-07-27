@@ -51,8 +51,6 @@ namespace cppmeta
         static void info() {}
     };
 
-<<<<<<< Updated upstream
-=======
     namespace detail
     {
         template<class T>
@@ -67,7 +65,6 @@ namespace cppmeta
         };
     }
 
->>>>>>> Stashed changes
     template<class T>
     struct reflect_ct;
 
@@ -2519,13 +2516,6 @@ namespace cppmeta
                 {
                     typedef type captured_type;
                     typedef ParentT captured_ParentT;
-<<<<<<< Updated upstream
-                    typedef cppmeta::reflect_ct<captured_ParentT> base;
-                    captured_type& get()
-                    {
-                        base::operator() < captured_ParentT > ();
-                        return cppmeta::detail::declstaticval<captured_type, captured_ParentT>();
-=======
                     typedef cppmeta::detail::reflect_ct_helper<captured_ParentT> base;
 
                     static captured_type& info()
@@ -2534,7 +2524,6 @@ namespace cppmeta
                             cppmeta::detail::declstaticval<captured_type, captured_ParentT>();
                         base::call(result);
                         return result;
->>>>>>> Stashed changes
                     }
                 };
                 static type &result = 
