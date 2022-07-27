@@ -33,10 +33,10 @@ struct type_for_ct_reflection
 template<>
 struct cppmeta::reflect<type_for_ct_reflection, cppmeta::reflection::compile_time>
 {
-    template<class meta_info>
-    void operator()() const
+    template<class meta>
+    static void info()
     {
-        cppmeta::reflect<type_for_ct_reflection>::
+        meta::
             name = "type_for_ct_reflection",
             members = 
                 member("type_for_ct_reflection()", &class_<type_for_ct_reflection>::default_constructor),
@@ -55,10 +55,10 @@ int some_data_ct;
 template<>
 struct cppmeta::reflect_ct<int>
 {
-    template<class meta_info>
-    void operator()() const
+    template<class meta>
+    static void info()
     {
-        meta_info::
+        meta::
             objects += 
                 object("some_data_ct", &some_data_ct);
             ;
