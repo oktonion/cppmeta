@@ -36,6 +36,13 @@ namespace tools
         en_1,
         en_2
     };
+
+    inline unsigned int rand()
+    {
+        static unsigned int seed = 4541;
+        seed = (8253729 * seed + 2396403);
+        return seed % 32768;
+    }
 }
 
 #endif // CPPMETA_TEST_TOOLS_H
