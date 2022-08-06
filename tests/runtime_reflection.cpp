@@ -44,6 +44,23 @@ TEST_CASE("reflect some types"){
         CHECK(some_data_rt_resolved == some_data_rt);
         CHECK(some_data_rt_const_resolved == some_data_rt_const);
     }
+
+    SUBCASE("resolving object by reference")
+    {
+        int& some_data_rt_resolved =
+            resolve<int&>::object("some_data_rt").value;
+        CHECK(some_data_rt_resolved == some_data_rt);
+
+        REQUIRE(some_data_rt_resolved != 42);
+        some_data_rt_resolved = 42;
+        CHECK(some_data_rt_resolved == 42);
+        CHECK(some_data_rt == 42);
+
+        const int& some_data_rt_const_resolved =
+            resolve<const int&>::object("some_data_rt_const").value;
+
+        CHECK(some_data_rt_const_resolved == some_data_rt_const);
+    }
 }
 
 TEST_CASE("reflect some class"){
