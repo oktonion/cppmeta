@@ -180,7 +180,7 @@ namespace cppmeta
         template< class T >
         struct add_reference
         {
-            typedef typename remove_reference<T>::type& type;
+            typedef T& type;
         };
 
         template< class T >
@@ -1343,7 +1343,7 @@ namespace cppmeta
             >::type value_param)
             : MemberInfo(name_param)
             , _value(value_param)
-            , value(any_cast<T&>(_value))
+            , value(any_cast<typename type_traits::add_reference<T>::type>(_value))
         { 
             is_member = true;
         }
@@ -1357,7 +1357,7 @@ namespace cppmeta
             >::type value_param)
             : MemberInfo(name_param)
             , _value(&value_param)
-            , value(any_cast<T&>(_value))
+            , value(any_cast<typename type_traits::add_reference<T>::type>(_value))
         { 
             is_member = true;
         }
@@ -1365,7 +1365,7 @@ namespace cppmeta
         Member(const Member& other)
             : MemberInfo(other)
             , _value(other._value)
-            , value(any_cast<T&>(_value))
+            , value(any_cast<typename type_traits::add_reference<T>::type>(_value))
         { }
 
         template<class OtherT>
@@ -1378,7 +1378,7 @@ namespace cppmeta
             >::type, OtherT>& other)
             : MemberInfo(other)
             , _value(static_cast<T>(other.value))
-            , value(any_cast<T&>(_value))
+            , value(any_cast<typename type_traits::add_reference<T>::type>(_value))
         { }
 
     private:
@@ -1434,7 +1434,7 @@ namespace cppmeta
         Value(const std::string& name_param, T value_param)
             : EntityInfo(name_param)
             , _value(value_param)
-            , value(any_cast<T&>(_value))
+            , value(any_cast<typename type_traits::add_reference<T>::type>(_value))
         { 
             is_value = true;
         }
@@ -1488,7 +1488,7 @@ namespace cppmeta
             >::type value_param)
             : EntityInfo(name_param)
             , _value(value_param)
-            , value(any_cast<T&>(_value))
+            , value(any_cast<typename type_traits::add_reference<T>::type>(_value))
         {
             is_object = true;
         }
@@ -1502,7 +1502,7 @@ namespace cppmeta
             >::type value_param)
             : EntityInfo(name_param)
             , _value(&value_param)
-            , value(any_cast<T&>(_value))
+            , value(any_cast<typename type_traits::add_reference<T>::type>(_value))
         {
             is_object = true;
         }
@@ -1510,7 +1510,7 @@ namespace cppmeta
         Object(const Object<T>& other)
             : EntityInfo(other)
             , _value(other._value)
-            , value(any_cast<T&>(_value))
+            , value(any_cast<typename type_traits::add_reference<T>::type>(_value))
         { }
 
     private:
@@ -1537,7 +1537,7 @@ namespace cppmeta
         Property(const std::string& name_param, T value_param)
             : EntityInfo(name_param)
             , _value(value_param)
-            , value(any_cast<T&>(_value))
+            , value(any_cast<typename type_traits::add_reference<T>::type>(_value))
             , is_bitfield(false)
         { 
             is_property = true;
@@ -1546,7 +1546,7 @@ namespace cppmeta
         Property(const Property &other)
             : EntityInfo(other)
             , _value(other.value)
-            , value(any_cast<T&>(_value))
+            , value(any_cast<typename type_traits::add_reference<T>::type>(_value))
             , is_bitfield(false)
         { }
 
@@ -1560,7 +1560,7 @@ namespace cppmeta
             >::type, OtherT>& other)
             : EntityInfo(other)
             , _value(static_cast<T>(other.value))
-            , value(any_cast<T&>(_value))
+            , value(any_cast<typename type_traits::add_reference<T>::type>(_value))
             , is_bitfield(false)
         { }
 
@@ -1585,7 +1585,7 @@ namespace cppmeta
         Function(const std::string& name_param, T value_param)
             : EntityInfo(name_param)
             , _function(value_param)
-            , function(any_cast<T&>(_function))
+            , function(any_cast<typename type_traits::add_reference<T>::type>(_function))
         { 
             is_function = true;
         }
@@ -1593,7 +1593,7 @@ namespace cppmeta
         Function(const Function& other)
             : EntityInfo(other)
             , _function(static_cast<T>(other.function))
-            , function(any_cast<T&>(_function))
+            , function(any_cast<typename type_traits::add_reference<T>::type>(_function))
         { }
 
         any invoke() const
