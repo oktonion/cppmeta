@@ -3525,8 +3525,9 @@ namespace cppmeta
             Value<T> value(
                 typename
                 type_traits::conditional<
-                    type_traits::is_simple_type<T>::value,
-                    const T&,
+                    type_traits::is_simple_type<T>::value == bool(true) &&
+                    type_traits::is_void<T>::value == bool(false),
+                    typename type_traits::add_const<typename type_traits::add_reference<T>::type>::type,
                     detail::disabled<__LINE__>
                 >::type value)
             {
