@@ -3186,7 +3186,10 @@ namespace cppmeta
         {
 
             static 
-            const Object<T> object(const T& value, bool extended_search = true)
+            const Object<T> object(
+                typename type_traits::add_const<
+                    typename type_traits::add_reference<T>::type>::type value, 
+                bool extended_search = true)
             {
                 struct lambdas
                 {
