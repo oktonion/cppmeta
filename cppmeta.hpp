@@ -176,6 +176,19 @@ namespace cppmeta
             : public remove_pointer_helper<T, typename remove_cv<T>::type>
         { };
 
+        // add_reference
+        template< class T >
+        struct add_reference
+        {
+            typedef typename remove_reference<T>::type& type;
+        };
+
+        template< class T >
+        struct add_reference<T&>
+        {
+            typedef T& type;
+        };
+
         namespace detail
         {
             typedef char yes_type;
@@ -3074,6 +3087,7 @@ namespace cppmeta
                 {
                     typedef typename type_traits::remove_reference<T>::type type_no_ref;
                     typedef typename type_traits::remove_pointer<T>::type type_no_ptr;
+                    typedef typename type_traits::add_reference<type_no_ptr>::type type_no_ptr_ref;
 
                     if (!type_traits::is_same<T, type_no_ref*>::value)
                     {
@@ -3088,12 +3102,12 @@ namespace cppmeta
                     }
                     if (!type_traits::is_same<type_no_ptr, T>::value)
                     {
-                        result = entity_resolver<type_no_ptr&, false>::entity(pred_arg, pred);
+                        result = entity_resolver<type_no_ptr_ref, false>::entity(pred_arg, pred);
                         if (result) return result;
 
                     }
                     if ( !type_traits::is_same<type_no_ptr, T>::value && 
-                         !type_traits::is_same<type_no_ptr&, type_no_ptr>::value)
+                         !type_traits::is_same<type_no_ptr_ref, type_no_ptr>::value)
                     {
                         result = entity_resolver<type_no_ptr, false>::entity(pred_arg, pred);
                         if (result) return result;
