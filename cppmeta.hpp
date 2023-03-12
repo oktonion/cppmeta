@@ -3698,7 +3698,7 @@ namespace cppmeta
             const std::string &
         >::type name, T& input)
     {
-        return Object<T*>(name, input);
+        return Object<T*>(name, &input);
     }
 
     template <class T>
