@@ -3031,8 +3031,8 @@ namespace cppmeta
             type_meta<T>::get_objects();
     }
 
-    template<class T, int RT>
-    struct reflect<T, RT>
+    template<class T>
+    struct reflect<T, cppmeta::reflection::run_time>
         : detail::type_meta<T>
     {
     };
@@ -3492,7 +3492,7 @@ namespace cppmeta
             static 
             typename
             type_traits::conditional<
-                type_traits::is_simple_type<T>::value,
+                type_traits::is_simple_type<typename type_traits::remove_reference<T>::type>::value,
                 Value<T>&,
                 detail::disabled<__LINE__>
             >::type value(const T& value, bool extended_search = true)
@@ -3581,8 +3581,8 @@ namespace cppmeta
 
     }
 
-    template<class T, int RT>
-    struct resolve<T, RT>
+    template<class T, int Reflection>
+    struct resolve
         : private detail::type_meta<T>
         , detail::object_resolver<T>
         , detail::member_resolver<T>
@@ -3592,8 +3592,8 @@ namespace cppmeta
         static const std::string& name;
     };
 
-    template<class T, int RT>
-    const std::string& resolve<T, RT>::name =
+    template<class T, int Reflection>
+    const std::string& resolve<T, Reflection>::name =
         detail::type_meta<T>::get_name();
 
 
