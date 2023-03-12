@@ -3683,27 +3683,23 @@ namespace cppmeta
 
 namespace cppmeta
 {
-    namespace detail
-    {
-        template <class T>
-        ObjectProxy<T*> object_heper(const std::string &name, T* input, int)
-        {
-            return Object<T*>(name, input);
-        }
-
-        template <class T>
-        ObjectProxy<T*> object_heper(const std::string &name, T& input, ...)
-        {
-            return Object<T*>(name, input);
-        }
-    }
     template <class T>
-    ObjectProxy<T*> object(const std::string &name, T& input)
+    ObjectProxy<T*> object(const std::string &name, T* input)
     {
-        return detail::object_heper(name, input, 0);
+        return Object<T*>(name, input);
     }
 
-
+    template <class T>
+    ObjectProxy<T*> object(
+        typename
+        type_traits::conditional<
+            type_traits::is_pointer<T>::value,
+            detail::disabled<__LINE__>,
+            const std::string &
+        >::type name, T& input)
+    {
+        return Object<T*>(name, input);
+    }
 
     template <class T>
     ObjectProxy<const T*> const_object(const std::string &name, const T* input)
