@@ -2075,7 +2075,7 @@ namespace cppmeta
             detail::entities_containter<ParentT>& operator,(
                 typename
                 type_traits::conditional<
-                    type_traits::is_simple_type<ParentT>::value,
+                    type_traits::is_simple_type<typename type_traits::remove_reference<ParentT>::type>::value,
                     disabled<__LINE__>,
                     const MembersProxy<ParentT>&
                 >::type)
@@ -3031,8 +3031,8 @@ namespace cppmeta
             type_meta<T>::get_objects();
     }
 
-    template<class T>
-    struct reflect<T>
+    template<class T, int RT>
+    struct reflect<T, RT>
         : detail::type_meta<T>
     {
     };
@@ -3274,7 +3274,7 @@ namespace cppmeta
             typedef 
             typename
             type_traits::conditional<
-                type_traits::is_simple_type<ParentT>::value,
+                type_traits::is_simple_type<typename type_traits::remove_reference<ParentT>::type>::value,
                 disabled<__LINE__>,
                 ParentT
             >::type parent_class;
@@ -3368,7 +3368,7 @@ namespace cppmeta
             static 
             typename
             type_traits::conditional<
-                type_traits::is_simple_type<ParentT>::value,
+                type_traits::is_simple_type<typename type_traits::remove_reference<ParentT>::type>::value,
                 const Entity&,
                 Member<ParentT, void>
             >::type member1(const std::string& name)
@@ -3581,8 +3581,8 @@ namespace cppmeta
 
     }
 
-    template<class T>
-    struct resolve<T>
+    template<class T, int RT>
+    struct resolve<T, RT>
         : private detail::type_meta<T>
         , detail::object_resolver<T>
         , detail::member_resolver<T>
@@ -3592,8 +3592,8 @@ namespace cppmeta
         static const std::string& name;
     };
 
-    template<class T>
-    const std::string& resolve<T>::name =
+    template<class T, int RT>
+    const std::string& resolve<T, RT>::name =
         detail::type_meta<T>::get_name();
 
 
@@ -3683,17 +3683,27 @@ namespace cppmeta
 
 namespace cppmeta
 {
+    namespace detail
+    {
+        template <class T>
+        ObjectProxy<T*> object_heper(const std::string &name, T* input, int)
+        {
+            return Object<T*>(name, input);
+        }
+
+        template <class T>
+        ObjectProxy<T*> object_heper(const std::string &name, T& input, ...)
+        {
+            return Object<T*>(name, input);
+        }
+    }
     template <class T>
     ObjectProxy<T*> object(const std::string &name, T& input)
     {
-        return Object<T*>(name, &input);
+        return detail::object_heper(name, input, 0);
     }
 
-    template <class T>
-    ObjectProxy<T*> object(const std::string &name, T* input)
-    {
-        return Object<T*>(name, input);
-    }
+
 
     template <class T>
     ObjectProxy<const T*> const_object(const std::string &name, const T* input)
