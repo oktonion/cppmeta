@@ -331,26 +331,102 @@ namespace cppmeta
             >::type * type;
         };
 
+        template<class T, template<class> class RemoverT, bool>
+        struct first_level_if_pointer
+        {
+            typedef
+            typename RemoverT<T>::type type;
+        };
+
+        template<class T, template<class> class RemoverT>
+        struct first_level_if_pointer<T, RemoverT, true>
+        {
+            typedef
+            typename
+            add_pointer<
+                typename RemoverT<typename remove_pointer<T>::type>::type
+            >::type type;
+        };
+
+        template<class T, template<class> class RemoverT, bool>
+        struct first_level_if_reference
+        {
+            typedef
+            typename
+            first_level_if_pointer<T, RemoverT, is_pointer<T>::value>::type type;
+        };
+
+        template<class T, template<class> class RemoverT>
+        struct first_level_if_reference<T, RemoverT, true>
+        {
+            typedef
+            typename 
+            RemoverT<
+                typename remove_reference<T>::type
+            >::type& type;
+        };
+
         template<class T, template<class> class RemoverT>
         struct first_level
         {
             typedef
             typename
-            conditional<
-                is_reference<T>::value,
-                typename 
-                RemoverT<
-                    typename remove_reference<T>::type
-                >::type&,
-                typename 
-                conditional<
-                    is_pointer<T>::value,
-                    typename
-                    add_pointer<
-                        typename RemoverT<typename remove_pointer<T>::type>::type
-                    >::type,
-                    typename RemoverT<T>::type
-                >::type
+            first_level_if_reference<
+                T, RemoverT, is_reference<T>::value
+            >::type type;
+        };
+
+        template<class, class> struct remover;
+        template<class T, class TT> struct remover<T, add_const<TT>/**/> {
+            typedef typename add_const<T>::type type;
+        };
+        template<class T, class TT> struct remover<T, remove_const<TT>/**/> {
+            typedef typename remove_const<T>::type type;
+        };
+
+        template<class T, class RemoverT, bool>
+        struct first_level_hack_if_pointer
+        {
+            typedef
+            typename remover<T, RemoverT>::type type;
+        };
+
+        template<class T, class RemoverT>
+        struct first_level_hack_if_pointer<T, RemoverT, true>
+        {
+            typedef
+            typename
+            add_pointer<
+                typename remover<typename remove_pointer<T>::type, RemoverT>::type
+            >::type type;
+        };
+
+        template<class T, class RemoverT, bool>
+        struct first_level_hack_if_reference
+        {
+            typedef
+            typename
+            first_level_hack_if_pointer<T, RemoverT, is_pointer<T>::value>::type type;
+        };
+
+        template<class T, class RemoverT>
+        struct first_level_hack_if_reference<T, RemoverT, true>
+        {
+            typedef
+            typename 
+            remover<
+                typename remove_reference<T>::type,
+                RemoverT
+            >::type& type;
+        };
+
+        template<class T, class RemoverT>
+        struct first_level_hack
+        {
+            typedef
+            typename
+            first_level_hack_if_reference<
+                T, RemoverT, is_reference<T>::value
             >::type type;
         };
     }
@@ -1426,7 +1502,7 @@ namespace cppmeta
         type_traits::conditional<
             type_traits::is_pointer<T>::value == bool(true),
             typename type_traits::remove_reference<T>::type,
-            typename type_traits::first_level<T, type_traits::add_const>::type
+            typename type_traits::first_level_hack<T, type_traits::add_const<T>/**/>::type
         >::type value_type;
 
         value_type &value;
