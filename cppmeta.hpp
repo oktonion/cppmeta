@@ -220,31 +220,6 @@ namespace cppmeta
         template<class U>
         detail::no_type is_simple_type_tester(...);
 
-        template<class T>
-        struct is_simple_type
-        {
-            static const bool value = 
-                sizeof(is_simple_type_tester<T>(0)) == sizeof(detail::no_type);
-        };
-
-        template<>
-        struct is_simple_type<void>
-        {
-            static const bool value = true;
-        };
-
-        template<class, class>
-        struct is_same
-        {
-            static const bool value = false;
-        };
-
-        template<class T>
-        struct is_same<T, T>
-        {
-            static const bool value = true;
-        };
-
         template<class>
         struct is_reference
         {
@@ -268,6 +243,48 @@ namespace cppmeta
         {
             static const bool value = true;
         };
+
+        template<class T, bool IsReference, bool IsPointer>
+        struct is_simple_type_impl
+        {
+            static const bool value = 
+                sizeof(is_simple_type_tester<T>(0)) == sizeof(detail::no_type);
+        };
+
+        template<class T, bool IsPointer>
+        struct is_simple_type_impl<T, true, IsPointer>
+            : is_reference<T>
+        { };
+
+        template<class T, bool IsReference>
+        struct is_simple_type_impl<T, IsReference, true>
+            : is_pointer<T>
+        { };
+
+        template<class T>
+        struct is_simple_type 
+            : is_simple_type_impl<T, is_reference<T>::value, is_pointer<T>::value>
+        { };
+
+        template<>
+        struct is_simple_type<void>
+        {
+            static const bool value = true;
+        };
+
+        template<class, class>
+        struct is_same
+        {
+            static const bool value = false;
+        };
+
+        template<class T>
+        struct is_same<T, T>
+        {
+            static const bool value = true;
+        };
+
+        
 
         template<unsigned N> struct priority_tag : priority_tag < N - 1 > {};
         template<> struct priority_tag<0> {};
@@ -383,6 +400,12 @@ namespace cppmeta
         template<class T, class TT> struct remover<T, remove_const<TT>/**/> {
             typedef typename remove_const<T>::type type;
         };
+        template<class T, class TT> struct remover<T, remove_volatile<TT>/**/> {
+            typedef typename add_const<T>::type type;
+        };
+        template<class T, class TT> struct remover<T, remove_cv<TT>/**/> {
+            typedef typename remove_const<T>::type type;
+        }; 
 
         template<class T, class RemoverT, bool>
         struct first_level_hack_if_pointer
@@ -2026,8 +2049,9 @@ namespace cppmeta
     template<class T>
     class ObjectProxy
     {
+        typedef T type;
     public:
-        typedef Object<T> entity_type;
+        typedef Object<type> entity_type;
 
         entity_type value;
 
@@ -2042,7 +2066,7 @@ namespace cppmeta
 
         detail::entities_containter<T>operator,(const ObjectProxy<T>& rhs) const
         {
-            typedef detail::entities_containter<T> container_type;
+            typedef detail::entities_containter<type> container_type;
 
             container_type container;
 
@@ -2055,7 +2079,7 @@ namespace cppmeta
 
         ~ObjectProxy()
         {
-            detail::EntitiesStorage<T>::internal::value().push_back(value);
+            detail::EntitiesStorage<type>::internal::value().push_back(value);
         }
     };
 
@@ -3201,10 +3225,10 @@ namespace cppmeta
 
                 if (result) return result;
 
-                typedef typename type_traits::first_level<T, type_traits::remove_const>::type type_no_const;
-                typedef typename type_traits::first_level<T, type_traits::add_const>::type type_const;
-                typedef typename type_traits::first_level<T, type_traits::remove_volatile>::type type_no_volatile;
-                typedef typename type_traits::first_level<T, type_traits::remove_cv>::type type_no_cv;
+                typedef typename type_traits::first_level_hack<T, type_traits::remove_const<T>/**/>::type type_no_const;
+                typedef typename type_traits::first_level_hack<T, type_traits::add_const<T>/**/>::type type_const;
+                typedef typename type_traits::first_level_hack<T, type_traits::remove_volatile<T>/**/>::type type_no_volatile;
+                typedef typename type_traits::first_level_hack<T, type_traits::remove_cv<T>/**/>::type type_no_cv;
                 
                 if ( !type_traits::is_same<type_no_const, T>::value )
                 {
@@ -3655,7 +3679,7 @@ namespace cppmeta
         };
 
 
-    }
+    } // namespace detail
 
     template<class T, int Reflection>
     struct resolve
