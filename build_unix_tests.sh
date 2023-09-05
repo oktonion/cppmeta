@@ -72,7 +72,7 @@ else
     foldername=$(dirname -- "$file")
     foldername=$(basename -- "$foldername")
     echo "$(date): compiling test c++03 $foldername-$filename"
-    if ! $COMPILER -std=c++03 -pedantic $exclude_warn $file -I./src/ $build_libs -o "./tests/bin/$foldername-$filename"; then
+    if ! $COMPILER -std=c++03 -pedantic $exclude_warn $file -I./src/ $build_libs -DDOCTEST_CONFIG_IMPLEMENT_WITH_MAIN -o "./tests/bin/$foldername-$filename"; then
       build_ok=0
     fi
   done
@@ -89,7 +89,7 @@ for file in ./tests/$testgroup/*.cpp; do
   foldername=$(dirname -- "$file")
   foldername=$(basename -- "$foldername")
   echo "$(date): compiling test c++98 $foldername-$filename"
-  if ! $COMPILER -std=c++98 -pedantic $exclude_warn $file -I./src/ $build_libs -o "./tests/bin/$foldername-$filename"; then
+  if ! $COMPILER -std=c++98 -pedantic $exclude_warn $file -I./src/ $build_libs -DDOCTEST_CONFIG_IMPLEMENT_WITH_MAIN -o "./tests/bin/$foldername-$filename"; then
     build_ok=0
   fi
 done

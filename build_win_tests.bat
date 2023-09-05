@@ -10,13 +10,13 @@ call "C:\Program Files (x86)\Microsoft Visual Studio 14.0\Common7\Tools\vsvars32
 
 for /f %%f in ('dir /b ".\tests\%1\*.cpp"') do (
   echo "compiling test %VisualStudioVersion% %%~nf"
-  cl -EHsc -W4 -Fo.\tests\obj\%%~nf.obj -c ".\tests\%1\%%f"
+  cl -nologo -EHsc -W4 -O2 -D DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN -Fo.\tests\obj\%%~nf.obj -c ".\tests\%1\%%f"
   IF ERRORLEVEL 1 (
     set "build_ok=false"
   )
 
   if "%build_ok%" == "true" (
-    cl /I \%cd%\src\ .\tests\obj\%%~nf.obj -Fe.\tests\bin\%%~nf.exe -link
+    cl -nologo -O2 /I \%cd%\src\ .\tests\obj\%%~nf.obj -Fe.\tests\bin\%%~nf.exe -link
     IF ERRORLEVEL 1 (
       set "build_ok=false"
     )

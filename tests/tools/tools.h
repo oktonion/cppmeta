@@ -1,10 +1,8 @@
 #ifndef CPPMETA_TEST_TOOLS_H
 #define CPPMETA_TEST_TOOLS_H
 
-#ifndef DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-    #define DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
-    #include "./doctest/doctest.h"
-#endif // DOCTEST_CONFIG_IMPLEMENT_WITH_MAIN
+
+#include "./doctest/doctest.h"
 
 namespace tools
 {
