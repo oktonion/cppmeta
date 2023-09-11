@@ -33,47 +33,8 @@ namespace cppmeta
         class disabled {};
     }
 
-    struct reflection
-    {
-        enum {
-            compile_time,
-            run_time
-        };
-    };
-
-    template<class T = detail::void_type, int Reflection = reflection::run_time>
-    struct reflect;
-
-    template<class T>
-    struct reflect<T, reflection::compile_time>
-    {
-        template<class meta>
-        static void info() {}
-    };
-
-    namespace detail
-    {
-        template<class T>
-        struct reflect_ct_helper
-            : cppmeta::reflect<T, reflection::compile_time>
-        {
-            using cppmeta::reflect<T, reflection::compile_time>::info;
-            template<class meta>
-            static void call(meta&)
-            {
-                return cppmeta::reflect<T, reflection::compile_time>::template info<meta>();
-            }
-        };
-    }
-
-    template<class T>
-    struct reflect_ct;
-
-    template<class T>
-    struct reflect_rt;
-
-    template<class T = detail::void_type, int Reflection = reflection::run_time>
-    struct resolve;
+    template<class T = detail::void_type>
+    struct reflexpr;
 
     namespace type_traits
     {
@@ -1328,7 +1289,7 @@ namespace cppmeta
             static
             std::string make_message(const std::string &name, const std::string &category_name, const std::string &msg)
             {
-                const std::string& resolved_name = resolve<T>::name;
+                const std::string& resolved_name = reflexpr<T>::name;
                 std::string parent_name_message = 
                     !resolved_name.empty() ?
                     (resolved_name + " ") :
@@ -1363,7 +1324,7 @@ namespace cppmeta
                     const std::string
                  >::type &category_name)
             {
-                return is_not_registered<T>(resolve<ValueT>::name, category_name + " entitiy");
+                return is_not_registered<T>(reflexpr<ValueT>::name, category_name + " entitiy");
             }
 
             template<class T>
@@ -2175,7 +2136,7 @@ namespace cppmeta
             detail::entities_containter<ParentT>& operator,(
                 typename
                 type_traits::conditional<
-                    type_traits::is_simple_type<typename type_traits::remove_reference<ParentT>::type>::value,
+                    type_traits::is_simple_type<ParentT>::value,
                     disabled<__LINE__>,
                     const MembersProxy<ParentT>&
                 >::type)
@@ -2614,17 +2575,13 @@ namespace cppmeta
             static T value;
             return value;
         }
+
+        template<class T>
+        T declval()
+        {
+            return T();
+        }
     }
-
-    template<int Reflection>
-    struct reflect<detail::void_type, Reflection>
-        : reflect<void, Reflection>
-    { };
-
-    template<int Reflection>
-    struct resolve<detail::void_type, Reflection>
-        : resolve<void, Reflection>
-    { };
 
     namespace detail
     {
@@ -2636,23 +2593,21 @@ namespace cppmeta
 
             static type& value()
             {
-                struct reflect_ct_local
-                    : cppmeta::reflect_ct<ParentT>
+                struct reflexpr_ct_local
+                    : cppmeta::reflexpr<ParentT>
                 {
                     typedef type captured_type;
                     typedef ParentT captured_ParentT;
-                    typedef cppmeta::detail::reflect_ct_helper<captured_ParentT> base;
+                    typedef cppmeta::reflexpr<captured_ParentT> base;
 
                     static captured_type& info()
                     {
-                        captured_type &result = 
-                            cppmeta::detail::declstaticval<captured_type, captured_ParentT>();
-                        base::call(result);
+                        captured_type &result = base::meta.entities;
                         return result;
                     }
                 };
                 static type &result = 
-                    reflect_ct_local::info();
+                    reflexpr_ct_local::info();
                 return result;
             }
 
@@ -2661,7 +2616,7 @@ namespace cppmeta
                 typedef typename detail::entities_containter<ParentT>::type type;
                 static type& value()
                 {
-                    return cppmeta::detail::declstaticval<type, ParentT>();
+                    return EntitiesStorage::value();
                 }
 
                 template<class, class>
@@ -2926,6 +2881,39 @@ namespace cppmeta
         using Values<void>::operator[];
     }  static values;
 
+    
+    struct Name
+    {
+        std::string operator=(const std::string& name)
+        {
+            return name;
+        }
+
+        template<class T>
+        const detail::entities_containter<T>& operator=(const detail::entities_containter<T>& value)
+        {
+            return value;
+        }
+
+        std::string operator[](const std::string& name)
+        {
+            return *this = name;
+        }
+
+        template<class T>
+        const detail::entities_containter<T>& operator[](const detail::entities_containter<T>& value)
+        {
+            return *this = value;
+        }
+    };
+
+    struct :
+        public Name
+    {
+        using Name::operator=;
+        using Name::operator[];
+    }  static name;
+
     template<class T>
     struct Objects
     {
@@ -3097,53 +3085,41 @@ namespace cppmeta
         template<class T>
         struct type_meta
         {
-            static std::string& name;
-            static Entities<T>& entities;
-            static Members<T>& members;
-            static Values<T>& values;
-            static Objects<T>& objects;
+            static std::string name;
+
         protected:
-            static std::string& get_name() { return detail::declstaticval<std::string, T>(); }
-            static Entities<T>& get_entities() { return detail::declstaticval<Entities<T>, __LINE__>(); }
-            static Members<T>&  get_members()  { return detail::declstaticval<Members<T>, __LINE__>(); }
-            static Values<T>&   get_values()   { return detail::declstaticval<Values<T>, __LINE__>(); }
-            static Objects<T>&  get_objects()  { return detail::declstaticval<Objects<T>, __LINE__>(); }
+            static Entities<T> entities;
+            static Members<T>  members;
+            static Values<T>   values;
+            static Objects<T>  objects;
+            static std::string get_name()     { return detail::declval<std::string/**/>(); }
+            static Entities<T> get_entities() { return detail::declval<Entities<T>/**/>(); }
+            static Members<T>  get_members()  { return detail::declval<Members<T>/**/>(); }
+            static Values<T>   get_values()   { return detail::declval<Values<T>/**/>(); }
+            static Objects<T>  get_objects()  { return detail::declval<Objects<T>/**/>(); }
         };
 
         template<class T>
-        std::string& type_meta<T>::name =
+        std::string type_meta<T>::name =
             type_meta<T>::get_name();
 
         template<class T>
-        Entities<T>& type_meta<T>::entities =
+        Entities<T> type_meta<T>::entities =
             type_meta<T>::get_entities();
 
         template<class T>
-        Members<T>& type_meta<T>::members =
+        Members<T> type_meta<T>::members =
             type_meta<T>::get_members();
 
         template<class T>
-        Values<T>& type_meta<T>::values =
+        Values<T> type_meta<T>::values =
             type_meta<T>::get_values();
 
         template<class T>
-        Objects<T>& type_meta<T>::objects =
+        Objects<T> type_meta<T>::objects =
             type_meta<T>::get_objects();
     }
 
-    template<class T>
-    struct reflect<T, cppmeta::reflection::run_time>
-        : detail::type_meta<T>
-    {
-    };
-
-    template<class T>
-    struct reflect_ct
-        : reflect<T, cppmeta::reflection::compile_time> {};
-
-    template<class T>
-    struct reflect_rt
-        : reflect<T, cppmeta::reflection::run_time> {};
 
     namespace detail
     {
@@ -3374,7 +3350,7 @@ namespace cppmeta
             typedef 
             typename
             type_traits::conditional<
-                type_traits::is_simple_type<typename type_traits::remove_reference<ParentT>::type>::value,
+                type_traits::is_simple_type<ParentT>::value,
                 disabled<__LINE__>,
                 ParentT
             >::type parent_class;
@@ -3681,20 +3657,8 @@ namespace cppmeta
 
     } // namespace detail
 
-    template<class T, int Reflection>
-    struct resolve
-        : private detail::type_meta<T>
-        , detail::object_resolver<T>
-        , detail::member_resolver<T>
-        , detail::function_resolver<T>
-        , detail::value_resolver<T>
-    {
-        static const std::string& name;
-    };
 
-    template<class T, int Reflection>
-    const std::string& resolve<T, Reflection>::name =
-        detail::type_meta<T>::get_name();
+
 
 
     template<class ClassT>
@@ -3715,6 +3679,33 @@ namespace cppmeta
     template<class StructT>
     struct struct_
         : class_<StructT> {};
+
+    template<class T>
+    struct reflexpr
+        : private detail::type_meta<T>
+        , private class_<T>
+        , detail::object_resolver<T>
+        , detail::member_resolver<T>
+        , detail::function_resolver<T>
+        , detail::value_resolver<T>
+    {
+        using detail::type_meta<T>::name;
+        typedef typename detail::entities_containter<T> meta_type;
+        static meta_type meta;
+
+    private:
+        using class_<T>::destructor;
+        using class_<T>::constructor;
+        using class_<T>::default_constructor;
+    };
+
+    template<class T>
+    typename reflexpr<T>::meta_type reflexpr<T>::meta =
+        detail::entities_containter<T>();
+
+    template<>
+    struct reflexpr<detail::void_type>
+    { };
 
     template<class T>
     detail::entities_containter<T> operator,(detail::entities_containter<T> container, const EntityProxy<T>& obj)
@@ -3745,8 +3736,9 @@ namespace cppmeta
     }
 
     template<class ParentT>
-    detail::entities_containter<ParentT> operator,(const std::string&, const detail::entities_containter<ParentT>& container)
+    detail::entities_containter<ParentT> operator,(const std::string&, detail::entities_containter<ParentT> container)
     {
+        detail::type_meta<ParentT>::name;
         return container;
     }
 }
