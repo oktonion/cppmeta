@@ -13,6 +13,7 @@ namespace tools
         type_for_reflection(int, int) {}
 
         int data1;
+        float data2;
 
         void func1(float) {}
 
@@ -25,9 +26,10 @@ namespace tools
     {
         int data2;
     };
-
-    int some_data_rt = 0;
-    const int some_data_rt_const = 0;
+    namespace {
+        int some_data_rt = 0;
+        const int some_data_rt_const = 0;
+    }
 
     enum enum_for_reflection
     {
