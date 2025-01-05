@@ -36,8 +36,7 @@ TEST_CASE("reflect some types"){
             , object("some_data_rt_const", some_data_rt_const)
         ,values +=
             constant("max_int", 2048)
-        ;
-     );
+    );
     
     SUBCASE("resolving object by value")
     {
@@ -95,8 +94,8 @@ TEST_CASE("reflect some class"){
     SUBCASE("resolving class data")
     {
         int type_for_rt_reflection::*  data1_tmp =
-            resolve<type_for_rt_reflection>::member<int>("data1").value;
-    );
+            reflexpr<type_for_rt_reflection>::member<int>("data1").value;
+    };
     
     SUBCASE("resolving class data1")
     {
